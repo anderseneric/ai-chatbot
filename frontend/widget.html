@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Widget</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0066cc;
+            --primary-hover: #0052a3;
+        }
+
+        /* Chat button */
+        #chat-button {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 60px;
+            height: 60px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 102, 204, 0.4);
+            z-index: 9998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        #chat-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 24px rgba(0, 102, 204, 0.5);
+        }
+
+        #chat-button svg {
+            width: 30px;
+            height: 30px;
+            fill: white;
+        }
+
+        /* Chat window */
+        #chat-window {
+            display: none;
+            position: fixed;
+            bottom: 100px;
+            right: 24px;
+            width: 380px;
+            height: 600px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+            z-index: 9999;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        #chat-window.open {
+            display: flex;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header */
+        #chat-header {
+            background: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        #chat-header-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #chat-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        #chat-title h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 2px;
+        }
+
+        #chat-title p {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        #close-button {
+            background: #f3f4f6;
+            border: none;
+            color: #6b7280;
+            font-size: 20px;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        #close-button:hover {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        /* Messages area */
+        #chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f9fafb;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .message.bot .message-avatar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+        }
+
+        .message.user .message-avatar {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+
+        .message-content {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+        }
+
+        .message.user .message-content {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Input area */
+        #chat-input-area {
+            padding: 16px 20px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        #chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 24px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+            font-family: inherit;
+            resize: none;
+            max-height: 100px;
+        }
+
+        #chat-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        #send-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        #send-button:hover:not(:disabled) {
+            background: var(--primary-hover);
+            transform: scale(1.05);
+        }
+
+        #send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #send-button svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+
+        /* File upload */
+        #file-upload {
+            position: relative;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        #file-button {
+            background: #f3f4f6;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        #file-button:hover {
+            background: #e5e7eb;
+        }
+
+        #file-button svg {
+            width: 20px;
+            height: 20px;
+            fill: #6b7280;
+        }
+
+        .file-preview {
+            background: #f3f4f6;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #9ca3af;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+            30% { transform: translateY(-8px); opacity: 1; }
+        }
+
+        /* Scrollbar */
+        #chat-messages::-webkit-scrollbar { width: 6px; }
+        #chat-messages::-webkit-scrollbar-track { background: transparent; }
+        #chat-messages::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+
+        /* Mobile */
+        @media (max-width: 480px) {
+            #chat-window {
+                width: calc(100vw - 16px);
+                height: calc(100vh - 100px);
+                right: 8px;
+                bottom: 80px;
+            }
+            #chat-button { right: 16px; bottom: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <button id="chat-button" onclick="toggleChat()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+        </svg>
+    </button>
+
+    <div id="chat-window">
+        <div id="chat-header">
+            <div id="chat-header-content">
+                <div id="chat-avatar">🤖</div>
+                <div id="chat-title">
+                    <h3 id="bot-name">Eric</h3>
+                    <p>Vanligvis svarer innen 1 min</p>
+                </div>
+            </div>
+            <button id="close-button" onclick="toggleChat()">×</button>
+        </div>
+        
+        <div id="chat-messages"></div>
+
+        <div id="chat-input-area">
+            <div id="file-upload">
+                <input type="file" id="file-input" accept="image/*,.pdf,.doc,.docx">
+                <button id="file-button" onclick="document.getElementById('file-input').click()">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/>
+                    </svg>
+                </button>
+            </div>
+            <textarea 
+                id="chat-input" 
+                placeholder="Skriv en melding..." 
+                rows="1"
+                onkeypress="handleKeyPress(event)"
+            ></textarea>
+            <button id="send-button" onclick="sendMessage()">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const CONFIG = {
+            backendUrl: 'http://localhost:5000',  // Change to your deployed URL
+            customerId: 'demo'  // Set this per customer
+        };
+
+        let conversationHistory = [];
+        let isWaitingForResponse = false;
+        let customerConfig = null;
+
+        // Load customer configuration
+        async function loadConfig() {
+            try {
+                const response = await fetch(`${CONFIG.backendUrl}/config/${CONFIG.customerId}`);
+                customerConfig = await response.json();
+                
+                // Apply custom styling
+                document.documentElement.style.setProperty('--primary-color', customerConfig.color);
+                document.getElementById('bot-name').textContent = customerConfig.bot_name;
+                
+                // Add welcome message
+                addMessage(customerConfig.welcome_message, 'bot');
+            } catch (error) {
+                console.error('Failed to load config:', error);
+            }
+        }
+
+        function toggleChat() {
+            const chatWindow = document.getElementById('chat-window');
+            const isOpening = !chatWindow.classList.contains('open');
+            
+            chatWindow.classList.toggle('open');
+            
+            if (isOpening && !customerConfig) {
+                loadConfig();
+            }
+            
+            if (isOpening) {
+                document.getElementById('chat-input').focus();
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey && !isWaitingForResponse) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (!message || isWaitingForResponse) return;
+
+            isWaitingForResponse = true;
+            document.getElementById('send-button').disabled = true;
+            
+            addMessage(message, 'user');
+            input.value = '';
+
+            conversationHistory.push({ role: 'user', content: message });
+
+            showTypingIndicator();
+
+            try {
+                const response = await fetch(`${CONFIG.backendUrl}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        customer_id: CONFIG.customerId,
+                        message: message,
+                        history: conversationHistory
+                    })
+                });
+
+                removeTypingIndicator();
+
+                if (!response.ok) throw new Error('Backend error');
+
+                const data = await response.json();
+                const botMessage = data.message;
+                
+                addMessage(botMessage, 'bot');
+                conversationHistory.push({ role: 'assistant', content: botMessage });
+
+            } catch (error) {
+                removeTypingIndicator();
+                addMessage('Beklager, jeg har tekniske problemer. Prøv igjen om litt.', 'bot');
+                console.error('Error:', error);
+            } finally {
+                isWaitingForResponse = false;
+                document.getElementById('send-button').disabled = false;
+            }
+        }
+
+        function addMessage(text, sender) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'message-avatar';
+            avatarDiv.textContent = sender === 'bot' ? '🤖' : '👤';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.textContent = text;
+            
+            messageDiv.appendChild(avatarDiv);
+            messageDiv.appendChild(contentDiv);
+            messagesDiv.appendChild(messageDiv);
+            
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const messagesDiv = document.getElementById('chat-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.id = 'typing-indicator';
+            
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'message-avatar';
+            avatarDiv.textContent = '🤖';
+            
+            const indicatorDiv = document.createElement('div');
+            indicatorDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+            
+            typingDiv.appendChild(avatarDiv);
+            typingDiv.appendChild(indicatorDiv);
+            messagesDiv.appendChild(typingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const typingDiv = document.getElementById('typing-indicator');
+            if (typingDiv) typingDiv.remove();
+        }
+
+        // File upload handler - attached after DOM loads
+        function setupFileUpload() {
+            const fileInput = document.getElementById('file-input');
+            if (fileInput) {
+                fileInput.addEventListener('change', async function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    console.log('File selected:', file.name); // Debug
+                    
+                    const fileMessage = `📎 I uploaded a file: ${file.name}`;
+                    
+                    // Add to UI
+                    addMessage(fileMessage, 'user');
+                    conversationHistory.push({ role: 'user', content: fileMessage });
+                    
+                    // Show typing
+                    showTypingIndicator();
+                    
+                    // Call backend
+                    try {
+                        const response = await fetch(`${CONFIG.backendUrl}/chat`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                customer_id: CONFIG.customerId,
+                                message: fileMessage,
+                                history: conversationHistory
+                            })
+                        });
+
+                        removeTypingIndicator();
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            addMessage(data.message, 'bot');
+                            conversationHistory.push({ role: 'assistant', content: data.message });
+                        } else {
+                            addMessage('File received! In production, I would analyze this.', 'bot');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        removeTypingIndicator();
+                        addMessage('File received! In production, I would analyze this.', 'bot');
+                    }
+                    
+                    // Reset
+                    e.target.value = '';
+                });
+            }
+        }
+        
+        // Initialize file upload when page loads
+        setupFileUpload();
+    </script>
+
+</body>
+</html>
