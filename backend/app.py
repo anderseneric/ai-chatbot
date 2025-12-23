@@ -354,7 +354,7 @@ ADDITIONAL:
         
         # Send email via SendGrid
         message = Mail(
-            from_email='eric.andersen.ai@outlook.com',
+            from_email='erico.andersen@outlook.com',
             to_emails='eric.andersen.ai@outlook.com',
             subject=f'New Chatbot Inquiry - {data.get("companyName", "Unknown Company")}',
             plain_text_content=email_content
