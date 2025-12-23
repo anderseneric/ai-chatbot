@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template_string
+from flask import Flask, request, jsonify, render_template_string, send_from_directory
 from flask_cors import CORS
 from openai import OpenAI
 import os
@@ -296,6 +296,14 @@ def admin_panel():
 @app.route('/health', methods=['GET'])
 def health():
     return jsonify({'status': 'healthy', 'mode': 'demo'})
+
+@app.route('/')
+def home():
+    return send_from_directory('../frontend', 'landing.html')
+
+@app.route('/widget.html')
+def widget():
+    return send_from_directory('../frontend', 'widget.html')
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
