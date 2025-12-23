@@ -97,7 +97,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
         }
 
         #chat-title h3 {
@@ -158,12 +160,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 12px;
+            font-weight: 600;
             flex-shrink: 0;
         }
 
         .message.bot .message-avatar {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+            color: white;
         }
 
         .message.user .message-avatar {
@@ -344,7 +348,7 @@
     <div id="chat-window">
         <div id="chat-header">
             <div id="chat-header-content">
-                <div id="chat-avatar">🤖</div>
+                <div id="chat-avatar">AI</div>
                 <div id="chat-title">
                     <h3 id="bot-name">Eric</h3>
                     <p>Vanligvis svarer innen 1 min</p>
@@ -380,25 +384,22 @@
 
     <script>
         const CONFIG = {
-            backendUrl: 'https://ai-chatbot-backend-j3j4.onrender.com',  // Change to your deployed URL
-            customerId: 'demo'  // Set this per customer
+            backendUrl: 'https://ai-chatbot-backend-j3j4.onrender.com',
+            customerId: 'demo'
         };
 
         let conversationHistory = [];
         let isWaitingForResponse = false;
         let customerConfig = null;
 
-        // Load customer configuration
         async function loadConfig() {
             try {
                 const response = await fetch(`${CONFIG.backendUrl}/config/${CONFIG.customerId}`);
                 customerConfig = await response.json();
                 
-                // Apply custom styling
                 document.documentElement.style.setProperty('--primary-color', customerConfig.color);
                 document.getElementById('bot-name').textContent = customerConfig.bot_name;
                 
-                // Add welcome message
                 addMessage(customerConfig.welcome_message, 'bot');
             } catch (error) {
                 console.error('Failed to load config:', error);
@@ -481,7 +482,7 @@
             
             const avatarDiv = document.createElement('div');
             avatarDiv.className = 'message-avatar';
-            avatarDiv.textContent = sender === 'bot' ? '🤖' : '👤';
+            avatarDiv.textContent = sender === 'bot' ? 'AI' : 'U';
             
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
@@ -502,7 +503,7 @@
             
             const avatarDiv = document.createElement('div');
             avatarDiv.className = 'message-avatar';
-            avatarDiv.textContent = '🤖';
+            avatarDiv.textContent = 'AI';
             
             const indicatorDiv = document.createElement('div');
             indicatorDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
@@ -518,7 +519,6 @@
             if (typingDiv) typingDiv.remove();
         }
 
-        // File upload handler - attached after DOM loads
         function setupFileUpload() {
             const fileInput = document.getElementById('file-input');
             if (fileInput) {
@@ -526,18 +526,13 @@
                     const file = e.target.files[0];
                     if (!file) return;
                     
-                    console.log('File selected:', file.name); // Debug
+                    const fileMessage = `I uploaded a file: ${file.name}`;
                     
-                    const fileMessage = `📎 I uploaded a file: ${file.name}`;
-                    
-                    // Add to UI
                     addMessage(fileMessage, 'user');
                     conversationHistory.push({ role: 'user', content: fileMessage });
                     
-                    // Show typing
                     showTypingIndicator();
                     
-                    // Call backend
                     try {
                         const response = await fetch(`${CONFIG.backendUrl}/chat`, {
                             method: 'POST',
@@ -564,13 +559,11 @@
                         addMessage('File received! In production, I would analyze this.', 'bot');
                     }
                     
-                    // Reset
                     e.target.value = '';
                 });
             }
         }
         
-        // Initialize file upload when page loads
         setupFileUpload();
     </script>
 
