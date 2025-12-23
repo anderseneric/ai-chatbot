@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot - Customer Intake Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .form-content {
+            padding: 40px;
+        }
+
+        .form-section {
+            margin-bottom: 40px;
+        }
+
+        .form-section h2 {
+            font-size: 24px;
+            color: #1e293b;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="url"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            font-weight: 400;
+            cursor: pointer;
+        }
+
+        .helper-text {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        .submit-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 50px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .success-message {
+            display: none;
+            background: #10b981;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 28px;
+            }
+            .form-content {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI Chatbot Solution</h1>
+            <p>Tell us about your business needs</p>
+        </div>
+
+        <div class="form-content">
+            <form id="intakeForm">
+                
+                <!-- Business Information -->
+                <div class="form-section">
+                    <h2>Business Information</h2>
+                    
+                    <div class="form-group">
+                        <label for="companyName">Company Name <span class="required">*</span></label>
+                        <input type="text" id="companyName" name="companyName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="businessType">Business Type <span class="required">*</span></label>
+                        <select id="businessType" name="businessType" required>
+                            <option value="">Select your business type</option>
+                            <option value="restaurant">Restaurant / Café</option>
+                            <option value="retail">Retail / E-commerce</option>
+                            <option value="salon">Hair Salon / Beauty</option>
+                            <option value="automotive">Automotive / Workshop</option>
+                            <option value="healthcare">Healthcare / Clinic</option>
+                            <option value="real-estate">Real Estate</option>
+                            <option value="legal">Legal Services</option>
+                            <option value="finance">Finance / Banking</option>
+                            <option value="fitness">Fitness / Gym</option>
+                            <option value="education">Education / Training</option>
+                            <option value="hospitality">Hotel / Hospitality</option>
+                            <option value="tech">Technology / SaaS</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="website">Website URL</label>
+                        <input type="url" id="website" name="website" placeholder="https://example.com">
+                        <div class="helper-text">If you have an existing website</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="companySize">Company Size <span class="required">*</span></label>
+                        <select id="companySize" name="companySize" required>
+                            <option value="">Select company size</option>
+                            <option value="1-10">1-10 employees</option>
+                            <option value="11-50">11-50 employees</option>
+                            <option value="51-200">51-200 employees</option>
+                            <option value="201-500">201-500 employees</option>
+                            <option value="500+">500+ employees</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="monthlyVisitors">Estimated Monthly Website Visitors / Customer Inquiries</label>
+                        <input type="number" id="monthlyVisitors" name="monthlyVisitors" placeholder="e.g., 5000">
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="form-section">
+                    <h2>Contact Information</h2>
+                    
+                    <div class="form-group">
+                        <label for="contactName">Your Name <span class="required">*</span></label>
+                        <input type="text" id="contactName" name="contactName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address <span class="required">*</span></label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" placeholder="+47 123 45 678">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role">Your Role <span class="required">*</span></label>
+                        <select id="role" name="role" required>
+                            <option value="">Select your role</option>
+                            <option value="owner">Owner / Founder</option>
+                            <option value="ceo">CEO / Managing Director</option>
+                            <option value="manager">Manager</option>
+                            <option value="it">IT / Tech Lead</option>
+                            <option value="marketing">Marketing / Sales</option>
+                            <option value="operations">Operations</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Chatbot Requirements -->
+                <div class="form-section">
+                    <h2>Chatbot Requirements</h2>
+                    
+                    <div class="form-group">
+                        <label>Primary Use Cases <span class="required">*</span></label>
+                        <div class="helper-text">Select all that apply</div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="use-customer-support" name="useCases" value="customer-support">
+                                <label for="use-customer-support">Customer Support / FAQ</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="use-lead-generation" name="useCases" value="lead-generation">
+                                <label for="use-lead-generation">Lead Generation</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="use-booking" name="useCases" value="booking">
+                                <label for="use-booking">Appointment Booking</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="use-order-tracking" name="useCases" value="order-tracking">
+                                <label for="use-order-tracking">Order Tracking</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="use-product-info" name="useCases" value="product-info">
+                                <label for="use-product-info">Product Information / Recommendations</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="use-multilingual" name="useCases" value="multilingual">
+                                <label for="use-multilingual">Multilingual Support</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="languages">Required Languages <span class="required">*</span></label>
+                        <input type="text" id="languages" name="languages" placeholder="e.g., Norwegian, English, Spanish" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Integrations Needed</label>
+                        <div class="helper-text">Select all systems you want to integrate with</div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="int-crm" name="integrations" value="crm">
+                                <label for="int-crm">CRM System (Salesforce, HubSpot, etc.)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="int-ecommerce" name="integrations" value="ecommerce">
+                                <label for="int-ecommerce">E-commerce Platform (Shopify, WooCommerce, etc.)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="int-booking" name="integrations" value="booking-system">
+                                <label for="int-booking">Booking System (Calendly, etc.)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="int-payment" name="integrations" value="payment">
+                                <label for="int-payment">Payment Gateway (Stripe, Vipps, etc.)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="int-email" name="integrations" value="email">
+                                <label for="int-email">Email Marketing (Mailchimp, etc.)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="int-analytics" name="integrations" value="analytics">
+                                <label for="int-analytics">Analytics (Google Analytics, etc.)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="specificFeatures">Specific Features or Requirements</label>
+                        <textarea id="specificFeatures" name="specificFeatures" placeholder="Describe any specific features, integrations, or custom requirements you need..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Current Situation -->
+                <div class="form-section">
+                    <h2>Current Situation</h2>
+                    
+                    <div class="form-group">
+                        <label for="currentSolution">Do you currently have a chatbot or customer service solution?</label>
+                        <select id="currentSolution" name="currentSolution">
+                            <option value="">Select option</option>
+                            <option value="none">No, we don't have one</option>
+                            <option value="basic">Yes, a basic one</option>
+                            <option value="advanced">Yes, an advanced solution</option>
+                            <option value="considering">Considering options</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="painPoints">What are your biggest customer service challenges?</label>
+                        <textarea id="painPoints" name="painPoints" placeholder="e.g., Long response times, repetitive questions, after-hours support, scaling issues..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="budget">Estimated Budget Range</label>
+                        <select id="budget" name="budget">
+                            <option value="">Select budget range</option>
+                            <option value="under-5k">Under 5,000 NOK/month</option>
+                            <option value="5k-10k">5,000 - 10,000 NOK/month</option>
+                            <option value="10k-20k">10,000 - 20,000 NOK/month</option>
+                            <option value="20k-50k">20,000 - 50,000 NOK/month</option>
+                            <option value="50k+">50,000+ NOK/month</option>
+                            <option value="flexible">Flexible / Depends on features</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="timeline">Desired Implementation Timeline</label>
+                        <select id="timeline" name="timeline">
+                            <option value="">Select timeline</option>
+                            <option value="urgent">Urgent (Within 2 weeks)</option>
+                            <option value="1-month">Within 1 month</option>
+                            <option value="1-3-months">1-3 months</option>
+                            <option value="3-6-months">3-6 months</option>
+                            <option value="flexible">Flexible / Just exploring</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Additional Information -->
+                <div class="form-section">
+                    <h2>Additional Information</h2>
+                    
+                    <div class="form-group">
+                        <label for="additionalInfo">Anything else you'd like us to know?</label>
+                        <textarea id="additionalInfo" name="additionalInfo" placeholder="Share any additional context, questions, or requirements..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hearAbout">How did you hear about us?</label>
+                        <select id="hearAbout" name="hearAbout">
+                            <option value="">Select option</option>
+                            <option value="linkedin">LinkedIn</option>
+                            <option value="google">Google Search</option>
+                            <option value="referral">Referral</option>
+                            <option value="social-media">Social Media</option>
+                            <option value="event">Event / Conference</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="submit-section">
+                    <button type="submit" class="submit-btn">Submit Application</button>
+                    <div id="successMessage" class="success-message">
+                        Thank you! Your submission has been received. We'll contact you within 24 hours.
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    document.getElementById('intakeForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitBtn = document.querySelector('.submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+        
+        // Collect form data
+        const formData = new FormData(this);
+        const data = {};
+        
+        // Handle regular fields
+        for (let [key, value] of formData.entries()) {
+            if (key === 'useCases' || key === 'integrations') {
+                if (!data[key]) data[key] = [];
+                data[key].push(value);
+            } else {
+                data[key] = value;
+            }
+        }
+        
+        try {
+            // Send to backend
+            const response = await fetch('/submit-intake', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Show success message
+                document.getElementById('successMessage').style.display = 'block';
+                document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+                
+                // Reset form after 3 seconds
+                setTimeout(() => {
+                    this.reset();
+                    document.getElementById('successMessage').style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Application';
+                }, 3000);
+            } else {
+                alert('Error submitting form. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Application';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error submitting form. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Application';
+        }
+    });
+   </script>
+</body>
+</html>

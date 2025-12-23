@@ -6,6 +6,8 @@ import json
 import time
 from datetime import datetime
 from dotenv import load_dotenv
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 load_dotenv()
 
@@ -304,6 +306,82 @@ def home():
 @app.route('/widget.html')
 def widget():
     return send_from_directory('../frontend', 'widget.html')
+
+@app.route('/intake')
+def intake_form():
+    return send_from_directory('../frontend', 'intake-form.html')
+
+@app.route('/submit-intake', methods=['POST'])
+def submit_intake():
+    """Handle intake form submission and send email"""
+    try:
+        data = request.json
+        
+        # Format email content
+        email_content = f"""
+NEW CHATBOT INQUIRY
+===================
+
+BUSINESS INFORMATION:
+- Company: {data.get('companyName', 'N/A')}
+- Business Type: {data.get('businessType', 'N/A')}
+- Website: {data.get('website', 'N/A')}
+- Company Size: {data.get('companySize', 'N/A')}
+- Monthly Visitors: {data.get('monthlyVisitors', 'N/A')}
+
+CONTACT INFORMATION:
+- Name: {data.get('contactName', 'N/A')}
+- Email: {data.get('email', 'N/A')}
+- Phone: {data.get('phone', 'N/A')}
+- Role: {data.get('role', 'N/A')}
+
+CHATBOT REQUIREMENTS:
+- Use Cases: {', '.join(data.get('useCases', [])) if data.get('useCases') else 'N/A'}
+- Languages: {data.get('languages', 'N/A')}
+- Integrations: {', '.join(data.get('integrations', [])) if data.get('integrations') else 'N/A'}
+- Specific Features: {data.get('specificFeatures', 'N/A')}
+
+CURRENT SITUATION:
+- Current Solution: {data.get('currentSolution', 'N/A')}
+- Pain Points: {data.get('painPoints', 'N/A')}
+- Budget: {data.get('budget', 'N/A')}
+- Timeline: {data.get('timeline', 'N/A')}
+
+ADDITIONAL:
+- Additional Info: {data.get('additionalInfo', 'N/A')}
+- Heard About Us: {data.get('hearAbout', 'N/A')}
+"""
+        
+        # Send email via SendGrid
+        message = Mail(
+            from_email='eric.andersen.ai@outlook.com',
+            to_emails='eric.andersen.ai@outlook.com',
+            subject=f'New Chatbot Inquiry - {data.get("companyName", "Unknown Company")}',
+            plain_text_content=email_content
+        )
+        
+        try:
+            sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
+            response = sg.send(message)
+            print(f"Email sent! Status code: {response.status_code}")
+        except Exception as e:
+            print(f"Error sending email: {e}")
+            # Still save to file as backup
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            with open(f'intake_submission_{timestamp}.txt', 'w', encoding='utf-8') as f:
+                f.write(email_content)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Form submitted successfully!'
+        })
+        
+    except Exception as e:
+        print(f"Error processing intake form: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
